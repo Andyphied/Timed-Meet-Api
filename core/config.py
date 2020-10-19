@@ -13,16 +13,8 @@ if ENVIRON == "LOCAL":
     DEBUG = True
 
 elif ENVIRON == "PRODUCTION":
-    db_params = {
-        "host": os.environ("HOST"),
-        "port": int(os.environ("PORT")),
-        "user": os.environ("USER"),
-        "pwd": os.environ("PWD"),
-        "db": os.environ("DB"),
-    }
 
-    DB_URI = "postgresql://{user}:{pwd}@{host}:{port}/{db}"
-    DB_URI = DB_URI.format(**db_params)
+    DB_URI = os.environ.get('DATABASE_URL')
     DEBUG = False
 
 
@@ -48,7 +40,7 @@ class Config(object):
 class Setting():
     API_TITLE = os.environ.get("API_TITLE", "MEET API")
     API_VERSION = os.environ.get("API_VERSION", "0.1")
-    JWT_SECRET_KEY: str = os.environ.get('PRIVATE_KEY',
+    JWT_SECRET_KEY: str = os.environ.get('JWT_SECRET_KEY',
                                          'OS0ceYEcMyZ9fqtCZO0F9A')
 
 
