@@ -3,9 +3,11 @@ from core.config import Config, setting
 from flask_migrate import Migrate, MigrateCommand
 from flask_jwt_extended import JWTManager
 from flask_smorest import Api
+from flask_cors import CORS
 
 migrate = Migrate()
 jwt = JWTManager()
+cors = CORS()
 
 
 def create_app():
@@ -29,6 +31,8 @@ def create_app():
     from schema import ma
 
     ma.init_app(app)
+
+    cors.init_app(app)
 
     from api import user_blp, auth_blp
 
