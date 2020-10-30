@@ -1,33 +1,24 @@
-from .schema import ma
-from marshmallow import EXCLUDE
+from .schema import BaseSchema, ma
 
 
-class UserRegSchema(ma.Schema):
+class UserRegSchema(BaseSchema):
     """A schema to validate what is sent in when registering"""
-    class Meta:
-        unknown = EXCLUDE
 
-    id = ma.Integer(dump_only=True)
     email = ma.String(required=True)
     password = ma.String(load_only=True)
     full_name = ma.String(required=True)
     is_superuser = ma.Boolean()
 
 
-class UserUpdateSchema(ma.Schema):
+class UserUpdateSchema(BaseSchema):
     """A schema to validate what is sent in when registering"""
-    class Meta:
-        unknown = EXCLUDE
 
-    id = ma.Integer(dump_only=True)
     email = ma.String()
     full_name = ma.String()
 
 
 class UserLoginSchema(ma.Schema):
     """The schema to help validate login arguments"""
-    class Meta:
-        unknown = EXCLUDE
 
     email = ma.String(required=True)
     password = ma.String(required=True)
