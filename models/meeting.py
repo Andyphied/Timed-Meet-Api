@@ -1,4 +1,5 @@
 from .models import Base, db
+from datetime import timedelta
 
 
 class Meeting(Base):
@@ -10,8 +11,8 @@ class Meeting(Base):
     id = db.Column(db.Integer, primary_key=True)
     meeting_name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.String(255))
-    set_duration = db.Column(db.Interval)
-    final_duration = db.Column(db.Interval)
+    set_duration = db.Column(db.Interval, default=timedelta(seconds=0))
+    final_duration = db.Column(db.Interval, default=timedelta(seconds=0))
     set_start_time = db.Column(db.Time)
     set_end_time = db.Column(db.Time)
     final_start_time = db.Column(db.Time)

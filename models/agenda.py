@@ -1,4 +1,5 @@
 from .models import Base, db
+from datetime import timedelta
 
 
 class Agenda(Base):
@@ -9,12 +10,10 @@ class Agenda(Base):
 
     id = db.Column(db.Integer, primary_key=True)
     agenda_name = db.Column(db.String(255), nullable=False)
-    set_duration = db.Column(db.Interval)
-    final_duration = db.Column(db.Interval)
-    set_start_time = db.Column(db.Time)
-    set_end_time = db.Column(db.Time)
-    final_start_time = db.Column(db.Time)
-    final_end_time = db.Column(db.Time)
+    set_duration = db.Column(db.Interval,
+                             nullable=False,
+                             default=timedelta(seconds=0))
+    final_duration = db.Column(db.Interval, default=timedelta(seconds=0))
     completed = db.Column(db.Boolean)
     meeting_id = db.Column(db.Integer,
                            db.ForeignKey('meeting.id'),
