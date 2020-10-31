@@ -3,7 +3,7 @@ from flask_smorest import Blueprint, abort
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from crud import user as user_crud, auth as auth_crud
-from schema import UserRegSchema, PaginateSchama, AuthTokenSchema,\
+from schema import UserRegSchema, PaginateSchema, AuthTokenSchema,\
     UserUpdateSchema, GenericMsgSchema
 
 # from app.models import User
@@ -17,7 +17,7 @@ user_blp = Blueprint("Users",
 @user_blp.route("/")
 class UserCreateGet(MethodView):
     @jwt_required
-    @user_blp.arguments(PaginateSchama)
+    @user_blp.arguments(PaginateSchema)
     @user_blp.response(UserRegSchema(many=True))
     def get(self, new_data):
         """[Admin] Reveal of users in the system - [PROTECTED]
