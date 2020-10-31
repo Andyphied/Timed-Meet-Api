@@ -1,24 +1,62 @@
-from typing import Any, Dict, List
-
-from crud.base import CRUDBase
-from models.agenda import Agenda, db
+from typing import List
+from datetime import timedelta
+from crud.base import CRUDBase, db
+from models.agenda import Agenda
 
 
 class CRUDAgenda(CRUDBase[Agenda]):
-    def create_with_meeting_id(self, obj_in: Dict[str, Any],
-                               meeting_id: int) -> Agenda:
-        db_obj = self.model(**obj_in, meeting_id=meeting_id)
-        db.session.add(db_obj)
-        db.session.commit()
-        db.session.refresh(db_obj)
-        return db_obj
-
     def get_multi_by_meeting(self,
                              meeting_id: int,
                              skip: int = 0,
                              limit: int = 100) -> List[Agenda]:
-        return (self.model.filter(
+        """Help get all agendas  under a meeting
+
+        Args:
+            meeting_id (int): The meeting unique id
+            skip (int, optional): number of entries to skip. Defaults to 0.
+            limit (int, optional): limit no of objects. Defaults to 100.
+
+        Returns:
+            List[Agenda]: The list of Agenda Object
+        """
+        return (Agenda.filter(
             meeting_id=meeting_id).offset(skip).limit(limit).all())
+
+    def get_meeting_id(self, agenda: Agenda) -> int:
+        """
+        help get meeting_id
+        """
+        meeting_id = agenda.meeting_id
+        return meeting_id
+
+    def completed(self, db_obj: Agenda, duration: timedelta) -> Agenda:
+        """Help mark an agenda as completed
+
+        Args:
+            agenda (Agenda): The agenda model object
+
+        Returns:
+            Agenda: [The updated agenda object
+        """
+
+        db_obj.completed = True
+        db_obj.final_duration = duration
+        db.session.add(db_obj)
+        db.session.commit()
+        db.session.refresh(db_obj)
+
+    def is_all_agenda_completed(self, meeting_id: int) -> bool:
+        """Checks if all the agendas in meeting has sbeen completed
+
+        Args:
+            meeting_id (int): The meeting unique id
+
+        Returns:
+            bool: True or False
+        """
+        meetings = self.get_multi_by_meeting(meeting_id=meeting_id)
+        status_set = {x.completed for x in meetings}
+        return all(status_set)
 
 
 agenda = CRUDAgenda(Agenda)
