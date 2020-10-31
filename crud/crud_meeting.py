@@ -2,6 +2,7 @@ from typing import Any, Dict, List
 from datetime import date, timedelta
 from crud.base import CRUDBase
 from models.meeting import Meeting, db
+from models.agenda import Agenda
 
 
 class CRUDMeeting(CRUDBase[Meeting]):
@@ -17,18 +18,14 @@ class CRUDMeeting(CRUDBase[Meeting]):
                            user_id: int,
                            skip: int = 0,
                            limit: int = 100) -> List[Meeting]:
-        return (Meeting.query.filter(
-            user_id=user_id).offset(skip).limit(limit).all())
+        return (Meeting.query.filter(user_id=user_id).offset(skip).limit(
+            limit).order_by('meeting_date').all())
 
-    def get_today_meetings(self,
-                           user_id: int,
-                           skip: int = 0,
-                           limit: int = 100) -> List[Meeting]:
-        return (Meeting.query.filter(
-            meeting_date=date.today()).offset(skip).limit(limit).all())
+    def get_today_meetings(self, user_id: int) -> List[Meeting]:
+        return (Meeting.query.filter(user_id=user_id).filter(
+            meeting_date=date.today()).order_by('created_on').all())
 
-    def is_user_meeting(self, user_id: int, meeting_id: int) -> bool:
-        meeting = Meeting.query.get(meeting_id)
+    def is_user_meeting(self, user_id: int, meeting: Meeting) -> bool:
         if meeting.user_id == user_id:
             return True
         return False
@@ -68,6 +65,35 @@ class CRUDMeeting(CRUDBase[Meeting]):
         """
         db_obj = self.get(meeting_id)
         db_obj.completed = True
+        db.session.add(db_obj)
+        db.session.commit()
+        db.session.refresh(db_obj)
+
+    def get_meeting_agendas(self, meeting: Meeting) -> List[Agenda]:
+        """Get meeting agendas
+
+        Args:
+            meeting (Meeting): The meeting object
+
+        Returns:
+            Meeting: [description]
+        """
+
+        meeting = meeting.agendas
+        return meeting
+
+    def start_meeting(self, data: Dict[str, Any]) -> Meeting:
+        """Start Meeting
+
+        Args:
+            start_time (time): Actual meeting start time
+            meeting_id (int): the meeting unique id
+
+        Returns:
+            Meeting: Meeting status
+        """
+        db_obj = self.get(data['meeting_id'])
+        db_obj.final_start_time = data['start_time']
         db.session.add(db_obj)
         db.session.commit()
         db.session.refresh(db_obj)
