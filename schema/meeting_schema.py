@@ -23,7 +23,7 @@ class MeetingSchemaAdmin(ma.SQLAlchemyAutoSchema):
 class MeetingSchema(MeetingCreateSchema):
 
     final_duration = ma.TimeDelta(precision='seconds', required=False)
-    final_start_time = ma.Time(required=True)
+    final_start_time = ma.Time(required=False)
     final_end_time = ma.Time(required=False)
 
 
@@ -35,5 +35,10 @@ class MeetingSchemaUser(MeetingSchema):
         'user':
         URLFor('MyUserDetails', values=None),
         'agendas':
-        URLFor('AgendaList', values=dict(meeting_id='<meeting_id>')),
+        URLFor('MeetingAgendas', values=dict(meeting_id='<meeting_id>')),
     })
+
+
+class StartMeetingSchema(ma.Schema):
+    meeting_id = ma.Integer(required=True)
+    start_time = ma.Time(required=True)
