@@ -62,4 +62,4 @@ Create a .env file and added the following variables along with their values in 
 - API_VERSION
 - JWT_SECRET_KEY
 
-Other variables in at .core/config can be tweaked as needed.
+Other variables in .core/config can be tweaked as needed.
