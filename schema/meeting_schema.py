@@ -25,20 +25,26 @@ class MeetingSchema(MeetingCreateSchema):
     final_duration = ma.TimeDelta(precision='seconds', required=False)
     final_start_time = ma.Time(required=False)
     final_end_time = ma.Time(required=False)
+    set_start_time = ma.Time(required=False)
+    meeting_name = ma.String(required=False)
 
 
 class MeetingSchemaUser(MeetingSchema):
-    class Meta:
-        model = Meeting
+    completed = ma.Boolean(dump_only=True)
 
     _links = Hyperlinks({
         'user':
-        URLFor('MyUserDetails', values=None),
+        URLFor('Users.MyUserDetails', values=None),
         'agendas':
-        URLFor('MeetingAgendas', values=dict(meeting_id='<meeting_id>')),
+        URLFor('Meetings.MeetingAgendas', values=dict(meeting_id='<id>')),
     })
 
 
 class StartMeetingSchema(ma.Schema):
     meeting_id = ma.Integer(required=True)
     start_time = ma.Time(required=True)
+
+
+class EndMeetingSchema(ma.Schema):
+    meeting_id = ma.Integer(required=True)
+    end_time = ma.Time(required=True)

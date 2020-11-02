@@ -11,12 +11,15 @@ class AgendaCreateSchema(BaseSchema):
 class AgendaSchema(AgendaCreateSchema):
 
     final_duration = ma.TimeDelta(precision='seconds', required=False)
+    completed = ma.Boolean(dump_only=True)
 
     _links = ma.Hyperlinks({
         'self':
-        ma.URLFor('AgendaUpdateGetDelete', values=dict(agend_id='<id>')),
+        ma.URLFor('Agendas.AgendaUpdateGetDelete',
+                  values=dict(agenda_id='<id>')),
         'meeting':
-        ma.URLFor('MeetingDetail', values=dict(id='<meeting_id>'))
+        ma.URLFor('Meetings.MeetingUpdateGetDelete',
+                  values=dict(meeting_id='<meeting_id>'))
     })
 
 

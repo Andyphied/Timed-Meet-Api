@@ -9,5 +9,5 @@ class BaseSchema(ma.Schema):
         unknown = EXCLUDE
 
     id = ma.Integer(dump_only=True)
-    created_on = ma.Datetime(dump_only=True)
-    updated_on = ma.Datetime(dump_only=True)
+    created_on = ma.DateTime(dump_only=True)
+    updated_on = ma.DateTime(dump_only=True)
