@@ -3,6 +3,7 @@ from typing import Any, Dict, Optional
 from crud.base import CRUDBase
 from models.users import User, db
 from core.security import verify_password, get_password_hash
+from .crud_meeting import meeting as crud_meeting
 
 
 class CRUDUser(CRUDBase[User]):
@@ -37,7 +38,7 @@ class CRUDUser(CRUDBase[User]):
         db.session.refresh(db_obj)
         return db_obj
 
-    def update(self, db_obj: User, obj_in: Dict[str, Any]) -> User:
+    def update(self, db_obj: User, obj_in: Dict[str, Any]) -> Dict[str, Any]:
 
         if "password" in obj_in:
             hashed_password = get_password_hash(obj_in["password"])
@@ -58,6 +59,20 @@ class CRUDUser(CRUDBase[User]):
 
     def is_active(self, user: User) -> bool:
         return user.is_superuser
+
+    def remove(self, id: int) -> User:
+        """Delete a user and all meetings under the user
+
+        Args:
+            id (int): user id
+
+        Returns:
+            Meeting: User object
+        """
+        user = self.get(id=id)
+        meetings = user.meetings
+        crud_meeting.remove_all(meetings=meetings)
+        return super().remove(id=id)
 
 
 user = CRUDUser(User)

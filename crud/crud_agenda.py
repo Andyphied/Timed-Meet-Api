@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any, Dict
 from datetime import timedelta
 from crud.base import CRUDBase, db
 from models.agenda import Agenda
@@ -20,7 +20,7 @@ class CRUDAgenda(CRUDBase[Agenda]):
             List[Agenda]: The list of Agenda Object
         """
         return (Agenda.filter(
-            meeting_id=meeting_id).offset(skip).limit(limit).all())
+            meeting_id == meeting_id).offset(skip).limit(limit).all())
 
     def get_meeting_id(self, agenda: Agenda) -> int:
         """
@@ -44,6 +44,7 @@ class CRUDAgenda(CRUDBase[Agenda]):
         db.session.add(db_obj)
         db.session.commit()
         db.session.refresh(db_obj)
+        return db_obj
 
     def is_all_agenda_completed(self, meeting_id: int) -> bool:
         """Checks if all the agendas in meeting has sbeen completed
@@ -57,6 +58,20 @@ class CRUDAgenda(CRUDBase[Agenda]):
         meetings = self.get_multi_by_meeting(meeting_id=meeting_id)
         status_set = {x.completed for x in meetings}
         return all(status_set)
+
+    def remove_all(self, agendas: List[Agenda]) -> Dict[str, Any]:
+        """Delete all agendas passed through
+
+        Args:
+            agendas (List[Meeting]): The List of agendas
+
+        Returns:
+            Dict[str, Any]: sucess message
+        """
+        for agenda in agendas:
+            agenda_id = agenda.id
+            self.remove(agenda_id)
+        return {'deleted': True}
 
 
 agenda = CRUDAgenda(Agenda)
