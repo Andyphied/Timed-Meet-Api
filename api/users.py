@@ -67,6 +67,7 @@ class MyUserDetails(MethodView):
     @user_blp.response(UserRegSchema(), code=201)
     def put(self, new_data):
         """Update a user own details - [PROTECTED]
+        Only send what has changed
         """
 
         user_id = get_jwt_identity()
@@ -74,6 +75,9 @@ class MyUserDetails(MethodView):
         if not user:
             abort(404, message="User not Found")
         user = user_crud.update(user, new_data)
+        if not user['added']:
+            abort(409, message="User with this email exits")
+        user = user['db_obj']
         return user
 
     @jwt_required
@@ -124,6 +128,8 @@ class UserById(MethodView):
 
         Args:
             user_id (int): [The User id]
+
+        Only send what has changed
         """
 
         request_id = get_jwt_identity()
@@ -133,6 +139,9 @@ class UserById(MethodView):
                   message="You do not have permission to view this endpoint")
         user = user_crud.get(user_id)
         user = user_crud.update(user, new_data)
+        if not user['added']:
+            abort(409, message="User with this email exist")
+        user = user['db_obj']
         return user
 
     @jwt_required
