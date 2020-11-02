@@ -106,6 +106,7 @@ class CRUDMeeting(CRUDBase[Meeting]):
         db.session.add(db_obj)
         db.session.commit()
         db.session.refresh(db_obj)
+        return db_obj
 
     def remove(self, id: int) -> Meeting:
         """Delete a meeting and all agendas under it
