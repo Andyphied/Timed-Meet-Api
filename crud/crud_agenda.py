@@ -19,7 +19,7 @@ class CRUDAgenda(CRUDBase[Agenda]):
         Returns:
             List[Agenda]: The list of Agenda Object
         """
-        return (Agenda.filter(
+        return (Agenda.query.filter(
             meeting_id == meeting_id).offset(skip).limit(limit).all())
 
     def get_meeting_id(self, agenda: Agenda) -> int:

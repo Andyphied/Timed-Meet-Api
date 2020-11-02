@@ -1,5 +1,5 @@
 from typing import Any, Dict, List
-from datetime import date, timedelta
+from datetime import date, timedelta, time
 from sqlalchemy.exc import IntegrityError
 
 from crud.base import CRUDBase
@@ -45,10 +45,16 @@ class CRUDMeeting(CRUDBase[Meeting]):
 
     def update_meeting_final_endtime(self, meeting: Meeting,
                                      interval: timedelta) -> Meeting:
-        data = {
-            "final_duration": (meeting.final_duration + interval),
-            "final_end_time": time_plus(meeting.final_start_time, interval)
-        }
+        if meeting.final_end_time:
+            data = {
+                "final_duration": (meeting.final_duration + interval),
+                "final_end_time": time_plus(meeting.final_end_time, interval)
+            }
+        else:
+            data = {
+                "final_duration": (meeting.final_duration + interval),
+                "final_end_time": time_plus(meeting.final_start_time, interval)
+            }
         meeting = self.update(meeting, data)
         return meeting
 
@@ -62,7 +68,7 @@ class CRUDMeeting(CRUDBase[Meeting]):
         meeting = self.update(meeting, data)
         return meeting
 
-    def completed(self, meeting_id: int) -> Meeting:
+    def end_meeting(self, meeting_id: int, end_time: time) -> Meeting:
         """Help mark an meeting as completed
 
         Args:
@@ -73,6 +79,8 @@ class CRUDMeeting(CRUDBase[Meeting]):
         """
         db_obj = self.get(meeting_id)
         db_obj.completed = True
+        db_obj.final_end_time = end_time
+        db_obj.final_duration = end_time - db_obj.final_start_time
         db.session.add(db_obj)
         db.session.commit()
         db.session.refresh(db_obj)
