@@ -34,9 +34,11 @@ def create_app():
 
     cors.init_app(app)
 
-    from api import user_blp, auth_blp
+    from api import user_blp, auth_blp, agenda_blp, meeting_blp
 
     api.register_blueprint(user_blp)
     api.register_blueprint(auth_blp)
+    api.register_blueprint(agenda_blp)
+    api.register_blueprint(meeting_blp)
 
     return app
