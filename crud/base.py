@@ -1,4 +1,5 @@
 from typing import Any, Dict, Generic, List, Optional, Type, TypeVar
+from sqlalchemy.exc import IntegrityError
 
 from models import db, Base
 
@@ -22,26 +23,35 @@ class CRUDBase(Generic[ModelType]):
     def get_multi(self, skip: int = 0, limit: int = 100) -> List[ModelType]:
         return self.model.query.offset(skip).limit(limit).all()
 
-    def create(self, obj_in: Dict[str, Any]) -> ModelType:
+    def create(self, obj_in: Dict[str, Any]) -> Dict[str, Any]:
         db_obj = self.model(**obj_in)
         db.session.add(db_obj)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return {'added': False}
+
         db.session.refresh(db_obj)
-        return db_obj
+        return {'added': True, 'db_obj': db_obj}
 
     def update(
         self,
         db_obj: ModelType,
         obj_in: Dict[str, Any],
-    ) -> ModelType:
+    ) -> Dict[str, Any]:
 
         for field in obj_in:
             if field in obj_in:
                 setattr(db_obj, field, obj_in[field])
         db.session.add(db_obj)
-        db.session.commit()
+        try:
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            return {'added': False}
         db.session.refresh(db_obj)
-        return db_obj
+        return {'added': True, 'db_obj': db_obj}
 
     def remove(self, id: int) -> ModelType:
         obj = self.model.query.get(id)
