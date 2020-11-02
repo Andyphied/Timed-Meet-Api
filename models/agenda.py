@@ -16,5 +16,5 @@ class Agenda(Base):
     final_duration = db.Column(db.Interval, default=timedelta(seconds=0))
     completed = db.Column(db.Boolean)
     meeting_id = db.Column(db.Integer,
-                           db.ForeignKey('meeting.id'),
+                           db.ForeignKey('meetings.id'),
                            nullable=False)
